@@ -1,34 +1,22 @@
 class Solution {
 public:
-    bool solve(vector<int>& nums, int i, int j, int turn, int score1,
-               int score2) {
+int t[23][23] ;
+    int solve(vector<int>& nums, int i, int j) {
         if (i > j)
-            return score1 >= score2;
+            return 0;
 
         if (i == j) {
-            if (turn == 0)
-                score1 += nums[i];
-            else
-                score2 += nums[i];
-
-            return score1 >= score2;
+            return nums[i];
         }
-        bool flag1 = false;
-        bool flag2 = false;
-        if (turn == 0) {
-            flag1 = solve(nums, i + 1, j, 1, score1 + nums[i], score2);
-            flag2 = solve(nums, i, j - 1, 1, score1 + nums[j], score2);
-            return  flag1 || flag2;
+        if(t[i][j]!=-1) return t[i][j];
+            int take_i = nums[i]-solve(nums, i + 1, j);
+            int take_j = nums[j]-solve(nums, i, j - 1 );
 
-        } else {
-            flag1 = solve(nums, i + 1, j, 0, score1, score2 + nums[i]);
-            flag2 = solve(nums, i, j - 1, 0, score1, score2 + nums[j]);
-            return flag1 && flag2;
-        }
-        return 0;
+        return t[i][j]=max(take_i,take_j);
     }
     bool predictTheWinner(vector<int>& nums) {
         int n = nums.size();
-        return solve(nums, 0, n - 1, 0, 0, 0);
+        memset(t,-1,sizeof(t));
+        return solve(nums, 0, n - 1)>=0;
     }
 };
