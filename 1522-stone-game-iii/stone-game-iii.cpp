@@ -1,32 +1,52 @@
 class Solution {
 public:
-    long long t[50001];
-    long long solve(vector<int>& nums, int i, vector<long long>& prefix) {
-        if (i >= nums.size())
+    int n;
+    int dp[50005][2];
+
+    int solve(vector<int>& stoneValue, int i, int turn) {
+        if (i >= n)
             return 0;
-        if (t[i] != LLONG_MIN)
-            return t[i];
-        long long maxi = LLONG_MIN;
-        for (int k = i; k < min(i + 3, (int)nums.size()); k++) {
 
-            maxi = max(maxi, prefix[k] - (i > 0 ? prefix[i - 1] : 0) -
-                                 solve(nums, k + 1, prefix));
+        if (dp[i][turn] != -1)
+            return dp[i][turn];
+
+        if (turn) { // Alice
+            int ans = INT_MIN;
+            int sum = 0;
+
+            for (int k = 0; k < 3 && i + k < n; k++) {
+                sum += stoneValue[i + k];
+                ans = max(ans, sum + solve(stoneValue, i + k + 1, 0));
+            }
+
+            return dp[i][turn] = ans;
+        } else { // Bob
+            int ans = INT_MAX;
+
+            for (int k = 0; k < 3 && i + k < n; k++) {
+                ans = min(ans, solve(stoneValue, i + k + 1, 1));
+            }
+
+            return dp[i][turn] = ans;
         }
-        return t[i] = maxi;
     }
-    string stoneGameIII(vector<int>& stoneValue) {
-        int n = stoneValue.size();
-        vector<long long> prefix(n);
-        prefix[0] = stoneValue[0];
 
-        for (int i = 1; i < n; i++) {
-            prefix[i] = prefix[i - 1] + stoneValue[i];
-        }
-        fill(t, t + 50001, LLONG_MIN);
-        long long diff = solve(stoneValue, 0, prefix);
-        if (diff > 0)
+    string stoneGameIII(vector<int>& stoneValue) {
+        n = stoneValue.size();
+
+        memset(dp, -1, sizeof(dp));
+
+        int alice = solve(stoneValue, 0, 1);
+
+        int total = 0;
+        for (int x : stoneValue)
+            total += x;
+
+        int bob = total - alice;
+
+        if (alice > bob)
             return "Alice";
-        if (diff < 0)
+        if (bob > alice)
             return "Bob";
         return "Tie";
     }
