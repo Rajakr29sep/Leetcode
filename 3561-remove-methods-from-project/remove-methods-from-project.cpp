@@ -9,6 +9,8 @@ public:
             if (vis[it] == 0) {
                 if (!toRemove(adj, it, vis))
                     return false;
+
+                    
             }
         }
         return true;
