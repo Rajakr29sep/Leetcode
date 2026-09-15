@@ -1,19 +1,6 @@
 class Solution {
 public:
-    vector<int> dp;
-    int solve(int i, string &s, vector<int>& isPal) {
-        if (i >= s.length())
-            return 0;
-        if (dp[i] != -1)
-            return dp[i];
-        int pick = INT_MIN;
-        if (isPal[i] != -1 && i + isPal[i] - 1 < s.length()) {
-            pick = 1 + solve(i + isPal[i], s, isPal);
-        }
-        int notPick = solve(i + 1, s, isPal);
-        return dp[i] = max(pick, notPick);
-    }
-    bool isPalindrome(string &  s ,int i1, int j1) {
+    bool isPalindrome(string& s, int i1, int j1) {
         int i = i1;
         int j = j1;
 
@@ -40,7 +27,16 @@ public:
             }
         }
 
-        dp.assign(n + 1, -1);
-        return solve(0, s, isPal);
+        vector<int> dp(n + 1);
+        dp[n] = 0;
+        for (int i = n - 1; i >= 0; i--) {
+            int pick = INT_MIN;
+            if (isPal[i] != -1 && i + isPal[i] - 1 <= n) {
+                pick = 1 + dp[i + isPal[i]];
+            }
+            int notPick = dp[i + 1];
+            dp[i] = max(pick, notPick);
+        }
+        return dp[0];
     }
 };
